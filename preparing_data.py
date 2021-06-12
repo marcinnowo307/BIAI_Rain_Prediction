@@ -15,9 +15,11 @@ from pathlib import Path #to manipulate files
 import sklearn as sk
 from sklearn import preprocessing
 from sklearn import model_selection
+import numpy
 
 #create a directory for the clean datasets
-Path("clean dataset").mkdir(exist_ok=True)                        
+Path("clean dataset").mkdir(exist_ok=True)      
+Path("clean dataset/encodings").mkdir(exist_ok=True)                        
 
 #Load the original csv file
 original = pd.read_csv("original dataset/weatherAUS.csv")
@@ -37,11 +39,14 @@ for i in object_columns:
     original[i].fillna(original[i].mode()[0] , inplace=True)
 
 #preprocessing data
-encoder = sk.preprocessing.LabelEncoder()
 
 # turn object cols to ints
 for i in object_columns:
-    original[i] = encoder.fit_transform(original[i])
+    encoder = sk.preprocessing.LabelEncoder()
+    encoder.fit(original[i])
+    numpy.save( 'clean dataset/encodings/{0}'.format(i), encoder.classes_)
+    original[i] = encoder.transform(original[i])
+    #original[i] = encoder.fit_transform(original[i])
     
 # fill continous NaN values with median
 tmp = (original.dtypes == "float64")
