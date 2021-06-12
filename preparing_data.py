@@ -28,26 +28,27 @@ original.isnull().sum()
 # Datetime conversion
 original['Date'] = pd.to_datetime(original["Date"])
 original['Month'] = original.Date.dt.month
-original['Day'] = original.Date.dt.day
+#original['Day'] = original.Date.dt.day
 
 # fill categorical NaN values with mode
-tmp = original.dtypes
-object_columns = list(tmp[original.dtypes == "object"].index)
+tmp = (original.dtypes == "object")
+object_columns = list(tmp[tmp].index)
 for i in object_columns:
     original[i].fillna(original[i].mode()[0] , inplace=True)
-
-# fill continous NaN values with median
-float_columns = list(tmp[original.dtypes == "float64"].index)
-for i in object_columns:
-    original[i].fillna(original[i].median() , inplace=True)
-
 
 #preprocessing data
 encoder = sk.preprocessing.LabelEncoder()
 
 # turn object cols to ints
 for i in object_columns:
-    original[i] = encoder.fit_transform(original[i]) # TODO change int32s to 64s
+    original[i] = encoder.fit_transform(original[i])
+    
+# fill continous NaN values with median
+tmp = (original.dtypes == "float64")
+float_columns = list(tmp[tmp].index)
+for i in object_columns:
+    original[i].fillna(original[i].median() , inplace=True)
+
     
 # find outliers and delete them
 target = original['RainTomorrow']
@@ -65,12 +66,12 @@ features.describe().T
 features['RainTomorrow'] = target
 
 #delete the outliers using IQR
-for i in ['Cloud3pm', 'Rainfall', 'Evaporation', 'WindSpeed9am', 'WindSpeed3pm']:
-    Q1 = features[i].quantile(0.25)
-    Q3 = features[i].quantile(0.75)
-    IQR = Q3 - Q1
-    lower_limit, upper_limit = Q1 - 2*IQR, Q3 + 2*IQR
-    features = features[(features[i] >= lower_limit) & (features[i] <= upper_limit)]
+#for i in ['Cloud3pm', 'Rainfall', 'Evaporation', 'WindSpeed9am']:
+#    Q1 = features[i].quantile(0.25)
+#    Q3 = features[i].quantile(0.75)
+#    IQR = Q3 - Q1
+#    lower_limit, upper_limit = Q1 - 5*IQR, Q3 + 5*IQR
+#    features = features[(features[i] >= lower_limit) & (features[i] <= upper_limit)]
 
 
 # hand trimming the dataset
@@ -92,13 +93,13 @@ features = features[(features["Temp9am"]<2.3)&(features["Temp9am"]>-2)]
 features = features[(features["Temp3pm"]<2.3)&(features["Temp3pm"]>-2)]
 
 ##################################################################
-plt.figure(figsize=(20,10))
-sns.boxplot(data = features)
-plt.xticks(rotation = 90)
-plt.show()
+#plt.figure(figsize=(20,10))
+#sns.boxplot(data = features)
+#plt.xticks(rotation = 90)
+#plt.show()
 ##################################################################
 
 print('Shape after deleting outliers ', features.shape)
 features.info()
 
-features.to_csv("clean dataset/weatherAUS.csv")
+features.to_csv("clean dataset/weatherAUS.csv", index=False)
