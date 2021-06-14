@@ -32,6 +32,10 @@ original['Date'] = pd.to_datetime(original["Date"])
 original['Month'] = original.Date.dt.month
 #original['Day'] = original.Date.dt.day
 
+# if target variable is null, drop it
+original.dropna(subset = ['RainTomorrow'], inplace = True)
+original.reset_index(drop = True, inplace = True)
+
 # fill categorical NaN values with mode
 tmp = (original.dtypes == "object")
 object_columns = list(tmp[tmp].index)
@@ -51,7 +55,7 @@ for i in object_columns:
 # fill continous NaN values with median
 tmp = (original.dtypes == "float64")
 float_columns = list(tmp[tmp].index)
-for i in object_columns:
+for i in float_columns:
     original[i].fillna(original[i].median() , inplace=True)
 
     
