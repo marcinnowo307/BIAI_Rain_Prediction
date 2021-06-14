@@ -5,24 +5,23 @@ Created on Sun Jun  6 23:15:58 2021
 @author: Marcinek
 """
 
-import os
-
 import matplotlib.pyplot as plt # for plotting
-import seaborn as sns # for plotting
-import tensorflow as tf #for ANN purposes
 import pandas as pd #for loading csv files
-from pathlib import Path #to manipulate files
+import numpy
 import sklearn as sk
 from sklearn import preprocessing
-from sklearn import model_selection
-import numpy
+from pathlib import Path #to manipulate files
+from pickle import dump
 
 #create a directory for the clean datasets
-Path("clean dataset").mkdir(exist_ok=True)      
-Path("clean dataset/encodings").mkdir(exist_ok=True)                        
+Path("clean_dataset").mkdir(exist_ok=True)      
+Path("neural_network").mkdir(exist_ok=True)
+Path("neural_network/scaling").mkdir(exist_ok=True)      
+Path("neural_network/encodings").mkdir(exist_ok=True)            
+
 
 #Load the original csv file
-original = pd.read_csv("original dataset/weatherAUS.csv")
+original = pd.read_csv("original_dataset/weatherAUS.csv")
 original.head()
 original.info()
 original.isnull().sum()
@@ -30,7 +29,6 @@ original.isnull().sum()
 # Datetime conversion
 original['Date'] = pd.to_datetime(original["Date"])
 original['Month'] = original.Date.dt.month
-#original['Day'] = original.Date.dt.day
 
 # if target variable is null, drop it
 original.dropna(subset = ['RainTomorrow'], inplace = True)
@@ -42,24 +40,26 @@ object_columns = list(tmp[tmp].index)
 for i in object_columns:
     original[i].fillna(original[i].mode()[0] , inplace=True)
 
-#preprocessing data
 
-# turn object cols to ints
-for i in object_columns:
-    encoder = sk.preprocessing.LabelEncoder()
-    encoder.fit(original[i])
-    numpy.save( 'clean dataset/encodings/{0}'.format(i), encoder.classes_)
-    original[i] = encoder.transform(original[i])
-    #original[i] = encoder.fit_transform(original[i])
-    
 # fill continous NaN values with median
 tmp = (original.dtypes == "float64")
 float_columns = list(tmp[tmp].index)
 for i in float_columns:
     original[i].fillna(original[i].median() , inplace=True)
 
+
+#preprocessing data
+
+# turn object cols to ints
+for i in object_columns:
+    encoder = sk.preprocessing.LabelEncoder()
+    encoder.fit(original[i])
+    numpy.save( 'neural_network/encodings/{0}'.format(i), encoder.classes_)
+    original[i] = encoder.transform(original[i])
+    #original[i] = encoder.fit_transform(original[i])
     
-# find outliers and delete them
+
+    
 target = original['RainTomorrow']
 features = original.drop(['RainTomorrow', 'Date'], axis=1)
 print('Shape before deleting outliers ', features.shape)
@@ -68,10 +68,12 @@ print('Shape before deleting outliers ', features.shape)
 column_names = list(features.columns)
 standard_scaler = preprocessing.StandardScaler()
 features = standard_scaler.fit_transform(features)
+dump(standard_scaler, open('neural network/scaling/scaler.pkl', 'wb'))
+#features = standard_scaler.transform(features)
 features = pd.DataFrame(features, columns=column_names)
 
-features.describe().T
 
+# find outliers and delete them
 features['RainTomorrow'] = target
 
 #delete the outliers using IQR
@@ -111,4 +113,4 @@ features = features[(features["Temp3pm"]<2.3)&(features["Temp3pm"]>-2)]
 print('Shape after deleting outliers ', features.shape)
 features.info()
 
-features.to_csv("clean dataset/weatherAUS.csv", index=False)
+features.to_csv("clean_dataset/weatherAUS.csv", index=False)

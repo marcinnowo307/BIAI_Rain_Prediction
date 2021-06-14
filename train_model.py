@@ -4,20 +4,18 @@ Created on Fri Jun 11 17:06:47 2021
 
 @author: Marcinek
 """
-import sys
-sys.path.insert(1, "neural_network")
 
-import tensorflow as tf #for ANN purposes
 import pandas as pd #for loading csv files
+import numpy as np
 from sklearn.model_selection import train_test_split
-from network import create_model
 from sklearn.metrics import classification_report
-import numpy
 
-numpy.random.seed(2137)
+from neural_network.network import create_model
+
+np.random.seed(2137)
 
 #loading and splitting data
-data = pd.read_csv("clean dataset/weatherAUS.csv")
+data = pd.read_csv("clean_dataset/weatherAUS.csv")
 x = data.drop(['RainTomorrow'], axis=1)
 y = data['RainTomorrow']
 x_train, x_test, y_train, y_test = train_test_split(x,
