@@ -9,7 +9,6 @@ import pandas as pd #for loading csv files
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-
 from neural_network.network import create_model
 
 np.random.seed(2137)
@@ -22,7 +21,6 @@ x_train, x_test, y_train, y_test = train_test_split(x,
                                                     y,
                                                     test_size = 0.2,
                                                     random_state = 40)
-data.info()
 
 
 model = create_model()
