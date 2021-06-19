@@ -40,7 +40,7 @@ def preprocess_data(df):
 
 def predict(df):
     model = create_model()
-    model.load_weights('neural_network/weights')
+    model.load_weights('neural_network/weights').expect_partial() # not everything is used from the weights
     pred = model.predict(df)
     return (pred > 0.5)
 
