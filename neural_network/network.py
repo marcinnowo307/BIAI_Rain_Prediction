@@ -12,13 +12,11 @@ def create_model():
         tf.keras.layers.Dense(units = 32, kernel_initializer = 'uniform', activation = 'relu', input_dim = 22),
         tf.keras.layers.Dense(units = 32, kernel_initializer = 'uniform', activation = 'relu'),
         tf.keras.layers.Dense(units = 16, kernel_initializer = 'uniform', activation = 'relu'),
-#        tf.keras.layers.Dropout(0.25),
         tf.keras.layers.Dense(units = 8, kernel_initializer = 'uniform', activation = 'relu'),
-#        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid')
         ])
     
-    opt = tf.keras.optimizers.Adam(learning_rate=0.00009)
+    #opt = tf.keras.optimizers.Adam(learning_rate=0.00009)
     model.compile(optimizer='adam',
         loss = 'binary_crossentropy',
         metrics = ['accuracy'])

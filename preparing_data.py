@@ -68,7 +68,7 @@ print('Shape before deleting outliers ', features.shape)
 column_names = list(features.columns)
 standard_scaler = preprocessing.StandardScaler()
 features = standard_scaler.fit_transform(features)
-dump(standard_scaler, open('neural network/scaling/scaler.pkl', 'wb'))
+dump(standard_scaler, open('neural_network/scaling/scaler.pkl', 'wb'))
 #features = standard_scaler.transform(features)
 features = pd.DataFrame(features, columns=column_names)
 
@@ -76,13 +76,14 @@ features = pd.DataFrame(features, columns=column_names)
 # find outliers and delete them
 features['RainTomorrow'] = target
 
+##################################################################
 #delete the outliers using IQR
-#for i in ['Cloud3pm', 'Rainfall', 'Evaporation', 'WindSpeed9am']:
-#    Q1 = features[i].quantile(0.25)
-#    Q3 = features[i].quantile(0.75)
-#    IQR = Q3 - Q1
-#    lower_limit, upper_limit = Q1 - 5*IQR, Q3 + 5*IQR
-#    features = features[(features[i] >= lower_limit) & (features[i] <= upper_limit)]
+# for i in ['Cloud3pm', 'Rainfall', 'Evaporation', 'WindSpeed9am']:
+#     Q1 = features[i].quantile(0.25)
+#     Q3 = features[i].quantile(0.75)
+#     IQR = Q3 - Q1
+#     lower_limit, upper_limit = Q1 - 7*IQR, Q3 + 7*IQR
+#     features = features[(features[i] >= lower_limit) & (features[i] <= upper_limit)]
 
 
 # hand trimming the dataset
@@ -103,7 +104,6 @@ features = features[(features["Cloud3pm"]<2)]
 features = features[(features["Temp9am"]<2.3)&(features["Temp9am"]>-2)]
 features = features[(features["Temp3pm"]<2.3)&(features["Temp3pm"]>-2)]
 
-##################################################################
 #plt.figure(figsize=(20,10))
 #sns.boxplot(data = features)
 #plt.xticks(rotation = 90)
